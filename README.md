@@ -107,7 +107,9 @@ A real-time multiplayer Hangman game built with Flask, MongoDB, and SocketIO.
 
 1. Ensure you have the `requirements.txt` file in the project directory, then create and activate the virtual environment
 2. Run the backend server: `python main.py`
-3. Use Postman to test API endpoints with valid JWT tokens (obtain tokens by logging in).
+3. Use Postman to test API endpoints with valid JWT tokens (obtain tokens by logging in). You can click on
+[![Run In Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/15809415-4c58130a-4a5f-4b71-a69b-7d8718499416?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D15809415-4c58130a-4a5f-4b71-a69b-7d8718499416%26entityType%3Dcollection%26workspaceId%3D5416b935-df23-4792-9c17-07f86f435f27)
+to view the Postman collection.
 4. Use Postman's WebSocket Request to connect to the SocketIO server (`ws://127.0.0.1:5000/hangman`) and test real-time events. (Don't forget to pass JWT token in the Authorization header).
 
 ## Deployment
