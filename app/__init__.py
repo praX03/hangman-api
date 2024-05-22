@@ -31,7 +31,9 @@ def create_app():
 
     JWTManager(app)
 
-    # socketio = SocketIO(app, cors_allowed_origins="*")
+    @app.route("/")
+    def index():
+        return "Hello! Welcome to Hangman API. Create API calls to {base_url}/api/{auth/rooms/game} to get started"
 
     from app.blueprints.api.auth.routes import auth
     from app.blueprints.api.game.routes import game

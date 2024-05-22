@@ -28,19 +28,23 @@ def start_game(room_id):
     if user["username"] not in room["players"]:
         return jsonify({"error": "User not in room"}), 403
 
-    # word = random.choice(WORDS)
-    level = request.get_json().get("level")
-    if level == "easy":
-        response = requests.get("https://random-word-api.herokuapp.com/word?length=5")
-    elif level == "medium":
-        response = requests.get("https://random-word-api.herokuapp.com/word?length=6")
-    elif level == "hard":
-        response = requests.get("https://random-word-api.herokuapp.com/word?length=7")
-    # response = requests.get("https://random-word-api.herokuapp.com/word")
+    data = request.get_json()
+
+    level = data.get("level", "medium")  # Set default to "medium" if not provided
+    if level not in ["easy", "medium", "hard"]:
+        return jsonify({"error": "Invalid level"}), 400
+
+    # Use the appropriate API call based on the chosen level
+    word_length = 5 + ["easy", "medium", "hard"].index(level)
+    response = requests.get(
+        f"https://random-word-api.herokuapp.com/word?length={word_length}"
+    )
+
     if response.status_code == 200:
         word = response.json()[0]
     else:
         return jsonify({"error": "Failed to fetch random word"}), response.status_code
+
     updated_game_state = {
         "word": word,
         "guessed_letters": [],
