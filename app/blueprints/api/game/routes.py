@@ -98,10 +98,12 @@ def process_guess(room_id, guess, username):
     if guess in guessed_letters:
         return {"error": "Letter already guessed"}, 400
 
-    guessed_letters.append(guess)
-
+    # guessed_letters.append(guess)
+    if guess in word:
+        guessed_letters.append(guess)
     if guess not in word:
         incorrect_guesses += 1
+        game_state["incorrect_guesses"] = incorrect_guesses
 
     # Update current player
     current_player_index = room["players"].index(username)

@@ -93,15 +93,23 @@ A real-time multiplayer Hangman game built with Flask, MongoDB, and SocketIO.
 
 ## SocketIO Events
 
+The Hangman Game API uses SocketIO for real-time communication between the server and clients. The following events are emitted by the server to provide updates to the connected clients:
+
 | Event         | Description                                                                | Payload                                                                                                      |
 | ------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `connect`     | Triggered when a client connects to the SocketIO server.                      | None                                                                                                         |
-| `player_joined` | Emitted to all players in the room when a new player joins.                  | `{ "username": "<username>", "room_id": "<room_id>" }`                                                          |
-| `game_started` | Emitted to all players when a new game starts in the room.                   | Initial `game_state` object                                                                                      |
-| `guess_made`  | Emitted to all players after a valid guess is made.                         | Updated `game_state` object                                                                                     |
-| `game_over`   | Emitted to all players when a game ends (win or lose).                      | `{ "winner": "<username>" }` (if won) or `{ "loser": "<username>", "word": "<word>" }` (if lost)             |
-| `player_left`  | Emitted to all players in the room when a player leaves.                    | `{ "username": "<username>", "room_id": "<room_id>" }`                                                          |
-| `error`       | Emitted when an error occurs (e.g., invalid token, unauthorized action). | `{ "message": "<error_message>" }`                                                                           |
+| `connect`     | **(Received by client)** Confirms a successful connection to the SocketIO server. | None                                                                                                         |
+| `player_joined` | **(Received by all clients in a room)** Notifies all players when a new player joins.                  | `{ "username": "<username>", "room_id": "<room_id>", "game_state": <game_state> }`                           |
+| `game_started` | **(Received by all clients in a room)** Notifies all players when a new game starts in the room.                   | Initial `game_state` object                                                                                      |
+| `guess_made`  | **(Received by all clients in a room)** Sent after a valid guess is made, updating the game state for all players. | Updated `game_state` object                                                                                     |
+| `game_over`   | **(Received by all clients in a room)** Sent when a game ends (win or lose).                      | `{ "winner": "<username>", "word": "<word>" }` (if won) or `{ "loser": "<username>", "word": "<word>" }` (if lost)             |
+| `player_left`  | **(Received by all clients in a room)** Notifies all players when a player leaves the room.                    | `{ "username": "<username>", "room_id": "<room_id>" }`                                                          |
+| `error`       | **(Received by the specific client that triggered the error)** Sent when an error occurs. | `{ "message": "<error_message>" }`                                                                           |
+
+**Important Note:**
+
+- These are **server-to-client** events. Your frontend should listen for these events using SocketIO's `on` method to receive real-time updates.
+- The client should **not** directly emit these events; they are triggered by the server in response to actions taken through the API endpoints or other events.
+                                                                         |
 
 ## Testing
 
