@@ -18,6 +18,7 @@ def create_room():
 
     new_room = GameRoom(password=password)
     db.game_rooms.insert_one(new_room.__dict__)
+    socketio.emit("room_created", {"room_id": new_room._id}, broadcast=True)
     return (
         jsonify({"room_id": new_room._id, "message": "Room created successfully"}),
         201,

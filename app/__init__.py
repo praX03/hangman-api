@@ -1,9 +1,9 @@
 # app/__init__.py
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
-from flask_socketio import SocketIO
+from flask_jwt_extended import JWTManager, get_jwt_identity
+from flask_socketio import SocketIO, emit, join_room
 from pymongo import MongoClient
 from pymongo.database import Database
 
@@ -42,5 +42,38 @@ def create_app():
     app.register_blueprint(auth, url_prefix="/api/auth")
     app.register_blueprint(rooms, url_prefix="/api/rooms")
     app.register_blueprint(game, url_prefix="/api/game")
+
+    @socketio.on("join_room", namespace="/hangman")
+    def on_join_room(data):
+        """Handle player joining a room."""
+        room_id = data["room_id"]
+        current_user_id = get_jwt_identity()
+        user = db.users.find_one({"_id": current_user_id})
+        room = db.game_rooms.find_one({"_id": room_id})
+
+        if user and room:
+            if user["username"] not in room["players"]:
+                room["players"].append(user["username"])
+                db.game_rooms.update_one(
+                    {"_id": room_id}, {"$set": {"players": room["players"]}}
+                )
+                join_room(room_id)  # noqa: F821
+                emit(
+                    "player_joined",
+                    {
+                        "username": user["username"],
+                        "room_id": room_id,
+                        "game_state": room["game_state"],
+                    },
+                    room=room_id,
+                )  # Broadcast joined event and game state
+            else:
+                emit(
+                    "error",
+                    {"message": "You are already in this room."},
+                    to=request.sid,
+                )
+        else:
+            emit("error", {"message": "Room not found"}, to=request.sid)
 
     return app

@@ -6,12 +6,13 @@ import socketio
 
 TOKEN = os.getenv("TEST_JWT_TOKEN")
 sio = socketio.Client()
+ROOM_ID = "ADD ROOM ID HERE"
 
 
 @sio.event
 def connect():
     print("Connected to server")
-    sio.emit("join_room", {"room_id": "your_room_id"})
+    sio.emit("join_room", {"room_id": ROOM_ID})
 
 
 @sio.on("player_joined")
